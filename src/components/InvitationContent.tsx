@@ -559,50 +559,6 @@ export const InvitationContent: React.FC<InvitationContentProps> = ({ data, gues
         </ScrollReveal>
       </section>
 
-      {/* Wishes Section (Persisten via /api/wishes) */}
-      <section className="max-w-xl mx-auto my-24 px-6 space-y-6 relative z-10">
-        <ScrollReveal direction="up">
-          <h2 className="text-2xl font-serif text-center text-amber-950 font-medium">Ucapan &amp; Doa</h2>
-          <form onSubmit={handleAddWish} className="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-amber-200/60 shadow-sm space-y-3 text-sm mt-6">
-            <input
-              type="text"
-              placeholder="Nama Anda"
-              required
-              value={newWish.name}
-              onChange={(e) => setNewWish({ ...newWish, name: e.target.value })}
-              className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-800"
-            />
-            <textarea
-              placeholder="Tuliskan ucapan & doa..."
-              required
-              rows={3}
-              value={newWish.message}
-              onChange={(e) => setNewWish({ ...newWish, message: e.target.value })}
-              className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-800"
-            />
-            <button
-              type="submit"
-              disabled={isSubmittingWish}
-              className="w-full py-2.5 bg-amber-800 hover:bg-amber-900 disabled:bg-stone-400 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95"
-            >
-              <Send className="w-4 h-4" /> {isSubmittingWish ? 'Mengirim...' : 'Kirim Ucapan (Tampil ke Semua Tamu)'}
-            </button>
-          </form>
-
-          <div className="space-y-3 mt-6">
-            {wishes.map((item) => (
-              <div key={item.id} className="bg-white/90 p-4.5 rounded-2xl border border-amber-200/60 shadow-sm space-y-1.5">
-                <div className="flex justify-between items-center text-xs text-amber-900">
-                  <span className="font-bold">{item.name}</span>
-                  <span className="text-[10px] text-stone-400 font-normal">{item.createdAt}</span>
-                </div>
-                <p className="text-sm text-stone-700 font-normal leading-relaxed">{item.message}</p>
-              </div>
-            ))}
-          </div>
-        </ScrollReveal>
-      </section>
-
       {/* Gift Section & Transfer Proof Confirmation */}
       <section className="max-w-xl mx-auto my-24 px-6 relative z-10">
         <ScrollReveal direction="up">
@@ -647,6 +603,50 @@ export const InvitationContent: React.FC<InvitationContentProps> = ({ data, gues
                 </div>
               ))}
             </div>
+          </div>
+        </ScrollReveal>
+      </section>
+
+      {/* Wishes Section (Persisten via /api/wishes) */}
+      <section className="max-w-xl mx-auto my-24 px-6 space-y-6 relative z-10">
+        <ScrollReveal direction="up">
+          <h2 className="text-2xl font-serif text-center text-amber-950 font-medium">Ucapan &amp; Doa</h2>
+          <form onSubmit={handleAddWish} className="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-amber-200/60 shadow-sm space-y-3 text-sm mt-6">
+            <input
+              type="text"
+              placeholder="Nama Anda"
+              required
+              value={newWish.name}
+              onChange={(e) => setNewWish({ ...newWish, name: e.target.value })}
+              className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-800"
+            />
+            <textarea
+              placeholder="Tuliskan ucapan & doa..."
+              required
+              rows={3}
+              value={newWish.message}
+              onChange={(e) => setNewWish({ ...newWish, message: e.target.value })}
+              className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-800"
+            />
+            <button
+              type="submit"
+              disabled={isSubmittingWish}
+              className="w-full py-2.5 bg-amber-800 hover:bg-amber-900 disabled:bg-stone-400 text-white font-medium rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95"
+            >
+              <Send className="w-4 h-4" /> {isSubmittingWish ? 'Mengirim...' : 'Kirim Ucapan (Tampil ke Semua Tamu)'}
+            </button>
+          </form>
+
+          <div className="space-y-3 mt-6">
+            {wishes.map((item) => (
+              <div key={item.id} className="bg-white/90 p-4.5 rounded-2xl border border-amber-200/60 shadow-sm space-y-1.5">
+                <div className="flex justify-between items-center text-xs text-amber-900">
+                  <span className="font-bold">{item.name}</span>
+                  <span className="text-[10px] text-stone-400 font-normal">{item.createdAt}</span>
+                </div>
+                <p className="text-sm text-stone-700 font-normal leading-relaxed">{item.message}</p>
+              </div>
+            ))}
           </div>
         </ScrollReveal>
       </section>

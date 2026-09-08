@@ -77,8 +77,8 @@ export interface InvitationData {
   quote: Quote;
   couple: Couple;
   events: EventItem[];
-  gallery: GalleryItem[];
-  loveStory: LoveStoryItem[];
+  gallery?: GalleryItem[];
+  loveStory?: LoveStoryItem[];
   gifts: GiftAccount[];
   theme: string;
   audioUrl?: string;

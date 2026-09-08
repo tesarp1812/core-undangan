@@ -13,6 +13,7 @@ COPY --from=base /app/package*.json ./
 COPY --from=base /app/.next ./.next
 COPY --from=base /app/public ./public
 COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/src/data ./src/data
 
 EXPOSE 3000
 CMD ["npm", "start"]

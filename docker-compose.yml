@@ -6,6 +6,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    volumes:
+      - ./src/data:/app/src/data
     networks:
       - app-network
 networks:

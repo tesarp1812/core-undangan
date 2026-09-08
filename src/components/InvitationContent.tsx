@@ -80,7 +80,7 @@ export const InvitationContent: React.FC<InvitationContentProps> = ({ data, gues
         if (saved) {
           try {
             setWishes(JSON.parse(saved));
-          } catch {}
+          } catch { }
         }
       }
     }

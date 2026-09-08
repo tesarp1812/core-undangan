@@ -237,40 +237,31 @@ export default function AdminPage() {
 *${guest.name}*
 (Di Tempat)
 
-Bismillahirrahmanirrahim
 Assalamu’alaikum Warahmatullahi Wabarakatuh
 
-Tanpa mengurangi rasa hormat, melalui pesan ini kami bermaksud menyampaikan kabar bahagia sekaligus mengundang Bapak/Ibu/Saudara/i untuk menghadiri acara pernikahan kami:
+Tanpa mengurangi rasa hormat, kami bermaksud mengundang Bapak/Ibu/Saudara/i pada acara pernikahan kami:
 
 *${male.fullName} (${male.name})*
-Putra dari Bpk. ${male.fatherName} & Ibu ${male.motherName}
-
 &
-
 *${female.fullName} (${female.name})*
-Putri dari Bpk. ${female.fatherName} & Ibu ${female.motherName}
 
-InsyaAllah acara akad nikah dan resepsi akan dilaksanakan pada:
-
+Acara insyaAllah akan dilaksanakan pada:
 🗓 Hari/Tanggal: ${event.date}
 ⏰ Waktu: ${event.startTime} ${event.timeZone} – Selesai
-📍 Lokasi: ${event.venue}
-📌 Alamat: ${event.address}
-🗺 Google Maps: ${event.mapsUrl}
+📍 Lokasi: ${event.venue} (${event.address})
 
-Untuk informasi lebih rinci mengenai detail acara, Bapak/Ibu/Saudara/i dapat mengakses tautan undangan digital kami berikut:
-🔗 ${url}
+ Buka Undangan Digital & Detail Acara di Sini: 
+👉 ${url} 👈
 
-Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu secara langsung kepada kedua mempelai.
+📍 Petunjuk Lokasi (Google Maps):
+${event.mapsUrl}
 
-Mengingat keterbatasan jarak dan waktu, mohon maaf apabila undangan ini disampaikan melalui pesan singkat WhatsApp. Atas perhatian, doa, dan kehadirannya, kami ucapkan terima kasih.
+Kehadiran dan doa restu Bapak/Ibu/Saudara/i merupakan kebahagiaan bagi kami. Mohon maaf apabila undangan ini disampaikan melalui WhatsApp.
 
 Wassalamu’alaikum Warahmatullahi Wabarakatuh
 
-Keluarga Besar & Salam Hangat Kami,
-
-*${male.name} & ${female.name}*
-(Beserta Keluarga Besar Kedua Mempelai)`;
+Salam hangat,
+*${male.name} & ${female.name} (Beserta Keluarga Besar)*`;
 
     const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
     window.open(waUrl, '_blank');
@@ -670,11 +661,10 @@ Keluarga Besar & Salam Hangat Kami,
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => handleToggleVerifyTransfer(item.id, item.status)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-95 flex items-center gap-1 ${
-                              item.status === 'verified'
-                                ? 'bg-stone-100 hover:bg-stone-200 text-stone-700'
-                                : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm'
-                            }`}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all active:scale-95 flex items-center gap-1 ${item.status === 'verified'
+                              ? 'bg-stone-100 hover:bg-stone-200 text-stone-700'
+                              : 'bg-emerald-700 hover:bg-emerald-800 text-white shadow-sm'
+                              }`}
                           >
                             <ShieldCheck className="w-3.5 h-3.5" />
                             {item.status === 'verified' ? 'Batalkan' : 'Konfirmasi Sah'}

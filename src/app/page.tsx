@@ -17,21 +17,38 @@ function InvitationView() {
   const [guestsList, setGuestsList] = useState<Guest[]>(defaultGuestsDataJson as Guest[]);
   const searchParams = useSearchParams();
 
-  // Load guests list from LocalStorage if available (to sync with /admin updates)
+  // Load guests list from API & LocalStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const savedGuests = localStorage.getItem('core_undangan_guests');
-      if (savedGuests) {
-        try {
-          const parsed = JSON.parse(savedGuests);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setGuestsList(parsed);
+    async function fetchGuests() {
+      try {
+        const res = await fetch('/api/guests');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setGuestsList(data);
+            return;
           }
-        } catch {
-          // fallback to default
+        }
+      } catch (err) {
+        console.log('Error fetching guests from API:', err);
+      }
+
+      if (typeof window !== 'undefined') {
+        const savedGuests = localStorage.getItem('core_undangan_guests');
+        if (savedGuests) {
+          try {
+            const parsed = JSON.parse(savedGuests);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setGuestsList(parsed);
+            }
+          } catch {
+            // fallback
+          }
         }
       }
     }
+
+    fetchGuests();
   }, []);
 
   // Read query params: 'to', 'id', or 'name'

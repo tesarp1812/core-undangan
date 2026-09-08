@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import defaultTransfers from '@/data/transfers.json';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const filePath = path.join(process.cwd(), 'src/data/transfers.json');
 
 export interface TransferRecord {

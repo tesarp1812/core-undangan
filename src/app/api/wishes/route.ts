@@ -4,6 +4,9 @@ import path from 'path';
 import defaultWishes from '@/data/wishes.json';
 import { WishItem } from '@/types/invitation';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const filePath = path.join(process.cwd(), 'src/data/wishes.json');
 
 function getStoredWishes(): WishItem[] {
@@ -66,5 +69,31 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error('API Wishes POST Error:', err);
     return NextResponse.json({ error: 'Gagal menyimpan ucapan' }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    const reset = searchParams.get('reset');
+
+    if (reset === 'true') {
+      saveWishes([]);
+      return NextResponse.json({ success: true, wishes: [] });
+    }
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID ucapan wajib diisi' }, { status: 400 });
+    }
+
+    const currentWishes = getStoredWishes();
+    const updatedWishes = currentWishes.filter(item => item.id !== id);
+
+    saveWishes(updatedWishes);
+    return NextResponse.json({ success: true, wishes: updatedWishes });
+  } catch (err) {
+    console.error('API Wishes DELETE Error:', err);
+    return NextResponse.json({ error: 'Gagal menghapus ucapan' }, { status: 500 });
   }
 }

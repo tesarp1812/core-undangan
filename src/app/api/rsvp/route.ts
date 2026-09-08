@@ -4,6 +4,9 @@ import path from 'path';
 import defaultRsvp from '@/data/rsvp.json';
 import { RsvpSubmission } from '@/types/invitation';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 const filePath = path.join(process.cwd(), 'src/data/rsvp.json');
 
 function getStoredRsvp(): RsvpSubmission[] {

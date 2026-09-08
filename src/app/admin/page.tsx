@@ -5,9 +5,10 @@ import { Lock, Key, UserPlus, Copy, Check, Share2, Trash2, Search, Download, Spa
 import defaultGuestsJson from '@/data/guests.json';
 import defaultRsvpJson from '@/data/rsvp.json';
 import defaultTransfersJson from '@/data/transfers.json';
+import defaultWishesJson from '@/data/wishes.json';
 import invitationData from '@/data/invitation.json';
 import { Guest } from '@/types/guest';
-import { RsvpSubmission } from '@/types/invitation';
+import { RsvpSubmission, WishItem } from '@/types/invitation';
 import { TransferRecord } from '@/app/api/transfers/route';
 
 // UUID Generator
@@ -46,6 +47,9 @@ export default function AdminPage() {
   const [transfers, setTransfers] = useState<TransferRecord[]>([]);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
+  // Wishes State
+  const [wishes, setWishes] = useState<WishItem[]>([]);
+
   // Load initial data
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -55,21 +59,38 @@ export default function AdminPage() {
         setIsAuthenticated(true);
       }
 
-      // Load Guests
-      const savedGuests = localStorage.getItem('core_undangan_guests');
-      if (savedGuests) {
+      // Load Guests from API & LocalStorage fallback
+      async function loadGuestsData() {
         try {
-          const parsed = JSON.parse(savedGuests);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setGuests(parsed);
-          } else {
+          const res = await fetch('/api/guests');
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) {
+              setGuests(data);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('core_undangan_guests', JSON.stringify(data));
+              }
+              return;
+            }
+          }
+        } catch (err) {
+          console.log('Error fetching guests from API:', err);
+        }
+
+        const savedGuests = localStorage.getItem('core_undangan_guests');
+        if (savedGuests) {
+          try {
+            const parsed = JSON.parse(savedGuests);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setGuests(parsed);
+              return;
+            }
+          } catch {
             setGuests(defaultGuestsJson as Guest[]);
           }
-        } catch {
+        } else {
           setGuests(defaultGuestsJson as Guest[]);
         }
-      } else {
-        setGuests(defaultGuestsJson as Guest[]);
       }
 
       // Load RSVP from API & LocalStorage
@@ -116,16 +137,44 @@ export default function AdminPage() {
         setTransfers(defaultTransfersJson as TransferRecord[]);
       }
 
+      // Load Wishes from API
+      async function loadWishesData() {
+        try {
+          const res = await fetch('/api/wishes');
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data)) {
+              setWishes(data);
+              return;
+            }
+          }
+        } catch (err) {
+          console.log('Error fetching wishes from API:', err);
+        }
+        setWishes(defaultWishesJson as WishItem[]);
+      }
+
+      loadGuestsData();
       loadRsvpData();
       loadTransfersData();
+      loadWishesData();
     }
   }, []);
 
-  // Save guests to LocalStorage on update
-  const saveGuestsList = (updated: Guest[]) => {
+  // Save guests to LocalStorage & Server API
+  const saveGuestsList = async (updated: Guest[]) => {
     setGuests(updated);
     if (typeof window !== 'undefined') {
       localStorage.setItem('core_undangan_guests', JSON.stringify(updated));
+    }
+    try {
+      await fetch('/api/guests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updated)
+      });
+    } catch (err) {
+      console.error('Error syncing guests to API:', err);
     }
   };
 
@@ -147,7 +196,7 @@ export default function AdminPage() {
   };
 
   // Add Guest
-  const handleAddGuest = (e: React.FormEvent) => {
+  const handleAddGuest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGuestName.trim()) return;
 
@@ -158,23 +207,55 @@ export default function AdminPage() {
     };
 
     const updated = [newGuest, ...guests];
-    saveGuestsList(updated);
+    setGuests(updated);
     setNewGuestName('');
     setNewGuestAddress('');
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('core_undangan_guests', JSON.stringify(updated));
+    }
+
+    try {
+      const res = await fetch('/api/guests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newGuest)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.guests) setGuests(data.guests);
+      }
+    } catch (err) {
+      console.error('Error adding guest to API:', err);
+    }
   };
 
   // Delete Guest
-  const handleDeleteGuest = (id: string) => {
+  const handleDeleteGuest = async (id: string) => {
     if (confirm('Yakin ingin menghapus tamu ini?')) {
       const updated = guests.filter(g => g.id !== id);
-      saveGuestsList(updated);
+      setGuests(updated);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('core_undangan_guests', JSON.stringify(updated));
+      }
+      try {
+        const res = await fetch(`/api/guests?id=${id}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.guests) setGuests(data.guests);
+        }
+      } catch (err) {
+        console.error('Error deleting guest from API:', err);
+      }
     }
   };
 
   // Reset to default JSON data
-  const handleResetToDefault = () => {
+  const handleResetToDefault = async () => {
     if (confirm('Kembalikan daftar tamu ke data default?')) {
-      saveGuestsList(defaultGuestsJson as Guest[]);
+      await saveGuestsList(defaultGuestsJson as Guest[]);
     }
   };
 
@@ -213,6 +294,42 @@ export default function AdminPage() {
       }
     } catch (err) {
       console.error('Error deleting transfer:', err);
+    }
+  };
+
+  // Delete Wish Record
+  const handleDeleteWish = async (id: string) => {
+    if (!confirm('Hapus ucapan ini?')) return;
+    try {
+      const res = await fetch(`/api/wishes?id=${id}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.wishes) {
+          setWishes(data.wishes);
+        }
+      }
+    } catch (err) {
+      console.error('Error deleting wish:', err);
+    }
+  };
+
+  // Reset All Wishes
+  const handleResetAllWishes = async () => {
+    if (!confirm('Kosongkan SELURUH daftar ucapan & doa dari semua tamu?')) return;
+    try {
+      const res = await fetch('/api/wishes?reset=true', {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.wishes) {
+          setWishes(data.wishes);
+        }
+      }
+    } catch (err) {
+      console.error('Error resetting wishes:', err);
     }
   };
 
@@ -677,6 +794,65 @@ Salam hangat,
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* DETAILED WISHES & DOA TABLE */}
+        <div className="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-amber-200/70 shadow-sm space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-serif text-amber-950 font-semibold flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-amber-700" /> Rekap &amp; Kelola Ucapan &amp; Doa
+            </h2>
+            <div className="flex items-center gap-2">
+              <span className="text-xs bg-amber-100 text-amber-900 px-3 py-1 rounded-full font-medium">
+                {wishes.length} Ucapan
+              </span>
+              {wishes.length > 0 && (
+                <button
+                  onClick={handleResetAllWishes}
+                  className="px-3 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-xs font-medium flex items-center gap-1 transition-all active:scale-95"
+                >
+                  <Trash2 className="w-3.5 h-3.5" /> Kosongkan Semua Ucapan
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-amber-200/80 bg-amber-50/50 text-stone-700">
+                  <th className="p-3 font-semibold rounded-l-xl">Nama Tamu</th>
+                  <th className="p-3 font-semibold">Pesan Ucapan &amp; Doa</th>
+                  <th className="p-3 font-semibold">Waktu Pengiriman</th>
+                  <th className="p-3 font-semibold rounded-r-xl">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {wishes.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="p-6 text-center text-stone-400">Belum ada ucapan &amp; doa yang masuk.</td>
+                  </tr>
+                ) : (
+                  wishes.map((item) => (
+                    <tr key={item.id} className="hover:bg-stone-50/80 transition-colors">
+                      <td className="p-3 font-semibold text-amber-950 whitespace-nowrap">{item.name}</td>
+                      <td className="p-3 text-stone-700 max-w-md italic">{item.message}</td>
+                      <td className="p-3 text-stone-400 whitespace-nowrap">{item.createdAt}</td>
+                      <td className="p-3">
+                        <button
+                          onClick={() => handleDeleteWish(item.id)}
+                          className="p-1.5 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                          title="Hapus Ucapan Ini"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </td>
                     </tr>
                   ))

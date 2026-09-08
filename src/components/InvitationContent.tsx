@@ -31,10 +31,7 @@ export const InvitationContent: React.FC<InvitationContentProps> = ({ data, gues
   const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
 
   // Wishes State (Persisten via /api/wishes)
-  const [wishes, setWishes] = useState<WishItem[]>([
-    { id: '1', name: 'Budi Santoso', message: 'Selamat Fia & Rizah! Semoga menjadi keluarga yang sakinah mawaddah warahmah.', createdAt: 'Minggu, 20 September 2026' },
-    { id: '2', name: 'Siti Rahma', message: 'Barakallah! Selamat menempuh hidup baru.', createdAt: 'Minggu, 20 September 2026' }
-  ]);
+  const [wishes, setWishes] = useState<WishItem[]>([]);
   const [newWish, setNewWish] = useState({ name: guestName || '', message: '' });
   const [isSubmittingWish, setIsSubmittingWish] = useState(false);
 

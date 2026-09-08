@@ -750,7 +750,7 @@ export const InvitationContent: React.FC<InvitationContentProps> = ({ data, gues
         <ScrollReveal direction="up">
           <p className="font-normal">Terima kasih atas kehadiran dan doa restunya.</p>
           <p className="font-serif font-semibold text-amber-900 text-sm">{data.couple.female.name} &amp; {data.couple.male.name}</p>
-          <p className="pt-4 text-[10px] text-stone-400">Powered by Core Undangan</p>
+          <p className="pt-4 text-[10px] text-stone-400">Powered by Tamatech</p>
         </ScrollReveal>
       </footer>
     </div>

@@ -1,30 +1,3 @@
 [
-  {
-    "id": "1788883175437",
-    "name": "Tesar Pratama Kurnia Akbar",
-    "guestCount": 3,
-    "status": "attending",
-    "createdAt": "8 Sep 2026, 22.59"
-  },
-  {
-    "id": "1788883026047",
-    "name": "Budi Santoso",
-    "guestCount": 5,
-    "status": "attending",
-    "createdAt": "8 Sep 2026, 22.57"
-  },
-  {
-    "id": "1",
-    "name": "Budi Santoso",
-    "guestCount": 2,
-    "status": "attending",
-    "createdAt": "20 September 2026 08:30"
-  },
-  {
-    "id": "2",
-    "name": "Siti Rahma",
-    "guestCount": 1,
-    "status": "attending",
-    "createdAt": "20 September 2026 09:15"
-  }
+  
 ]
